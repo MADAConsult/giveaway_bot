@@ -29,10 +29,13 @@ async def check_channels_subscriptions(
             user_id=user_id
         )
 
-        if user_channel_info['status'] == 'member':
+        if user_channel_info['status'] == 'member' or user_channel_info['status'] == 'administrator' or user_channel_info['status'] == 'creator':
             continue
 
         else:
+
+            print(f'User {user_id} is subscribed to the channel {channel_id}')
+            print(f'User status: {user_channel_info["status"]}')
             return False
 
     else:

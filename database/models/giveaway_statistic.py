@@ -133,6 +133,14 @@ class GiveAwayStatistic(Model):
             ).update(members=members)
 
             return True
+    
+    
+    async def get_all_members(self, giveaway_callback_value: str) -> list:
+        data = await self.filter(
+            giveaway_callback_value=giveaway_callback_value
+        ).all().values('members')
+
+        return data[0]['members']
 
 
 

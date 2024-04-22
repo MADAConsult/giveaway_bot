@@ -13,32 +13,25 @@ from database import GiveAway
 
 
 
+# @dp.callback_query_handler(
+#     text=bt_admin_create_give.callback_data,
+#     state='*'
+# )
+# async def start_create_give(jam: types.CallbackQuery):
+
+#     await jam.message.edit_text(
+#         'Выберите тип розыгрыша: ',
+#         reply_markup=kb_admin_select_type_of_give
+#     )
+
+
+
 @dp.callback_query_handler(
     text=bt_admin_create_give.callback_data,
     state='*'
 )
-async def start_create_give(jam: types.CallbackQuery):
-
-    await jam.message.edit_text(
-        'Выберите тип розыгрыша: ',
-        reply_markup=kb_admin_select_type_of_give
-    )
-
-
-
-@dp.callback_query_handler(
-    text=[
-        bt_admin_give_type_button.callback_data,
-        bt_admin_give_type_comments.callback_data
-    ]
-)
 async def get_type_of_give(jam: types.CallbackQuery, state: FSMContext):
-    callback = jam.data
-
-    if callback == bt_admin_give_type_button.callback_data:
-        await state.update_data(give_type='button')
-    else:
-        await state.update_data(give_type='comments')
+    await state.update_data(give_type='button')
 
 
     await jam.message.edit_text(
@@ -243,7 +236,7 @@ async def ask_about_edit_give_date(jam: types.CallbackQuery, state: FSMContext):
     else:
 
         state_data = await state.get_data()
-        if state_data['give_type'] == 'button':
+        if False:
 
             await jam.message.edit_text(
                 'Хотите добавить капчу для розыгрыша ? (Защита от ботов)',

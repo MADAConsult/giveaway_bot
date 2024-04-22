@@ -1,10 +1,14 @@
 import pytz
+from dotenv import load_dotenv
+import os
 
-OWNERS = []
+load_dotenv()
 
-bot_token = ''
-database_url = ''
-timezone_info = pytz.timezone('Europe/Moscow')
+OWNERS = [os.getenv('OWNER_ID')]
+
+bot_token = os.getenv('BOT_TOKEN')
+database_url = os.getenv('DB_URL')
+timezone_info = pytz.timezone('Asia/Aqtobe')
 
 start_text = 'Главное меню: '
 text_for_participation_in_comments_giveaways = 'Участвую'
