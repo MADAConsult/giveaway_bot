@@ -56,15 +56,17 @@ async def manage_active_giveaways():
 
                     time_diff = giveaway["over_date"] - current_time
                     if time_diff == datetime_.timedelta(hours=hours_to_end):
-                        await send_giveaway_end_notification(
-                            give_callback_value=giveaway['callback_value']
-                        )
+                        pass
+                        # await send_giveaway_end_notification(
+                        #     give_callback_value=giveaway['callback_value']
+                        # )
 
                 if current_time >= giveaway["over_date"]:
-                    await process_end_of_giveaway(
-                        give_callback_value=giveaway['callback_value'],
-                        owner_id=giveaway['owner_id']
-                    )
+                    pass
+                    # await process_end_of_giveaway(
+                    #     give_callback_value=giveaway['callback_value'],
+                    #     owner_id=giveaway['owner_id']
+                    # )
 
 
         await asyncio.sleep(30)

@@ -30,7 +30,7 @@ async def start_give(jam: types.CallbackQuery, state: FSMContext):
     message_id = 0
 
     for give in give_data:
-        message_text = f'{give["name"]}\n\n{give["text"]}\n\nКоличество победителей: {give["winners_count"]}\nДата завершения: {give["over_date"].strftime("%d.%m.%Y %H:%M")}'
+        message_text = f'{give["name"]}\n\n{give["text"]}\n\nКоличество победителей: {give["winners_count"]}'
 
         if channel_data:
 
@@ -46,39 +46,44 @@ async def start_give(jam: types.CallbackQuery, state: FSMContext):
 
             for channel in channel_data:
 
-                if give["type"] == 'comments':
-                    if not bool(channel['group_id']):
-                        await jam.answer('У вас нет подключенных групп к каналам')
-                        return
+                try:
+                
+                    if give["type"] == 'comments':
+                        if not bool(channel['group_id']):
+                            await jam.answer('У вас нет подключенных групп к каналам')
+                            return
 
 
-                message = ''
-                if give["photo_id"] is None and give["video_id"] is None:
-                    message = await bot.send_message(
-                        chat_id=channel['channel_id'],
-                        text=message_text,
-                        reply_markup=markup if give["type"] == 'button' else None
-                    )
+                    message = ''
+                    if give["photo_id"] is None and give["video_id"] is None:
+                        message = await bot.send_message(
+                            chat_id=channel['channel_id'],
+                            text=message_text,
+                            reply_markup=markup if give["type"] == 'button' else None
+                        )
 
-                elif give["photo_id"]:
-                    message = await bot.send_photo(
-                        chat_id=channel['channel_id'],
-                        photo=give["photo_id"],
-                        caption=message_text,
-                        reply_markup=markup if give["type"] == 'button' else None
-                    )
+                    elif give["photo_id"]:
+                        message = await bot.send_photo(
+                            chat_id=channel['channel_id'],
+                            photo=give["photo_id"],
+                            caption=message_text,
+                            reply_markup=markup if give["type"] == 'button' else None
+                        )
 
-                elif give["video_id"]:
-                    message = await bot.send_video(
-                        chat_id=channel['channel_id'],
-                        video=give["video_id"],
-                        caption=message_text,
-                        reply_markup=markup if give["type"] == 'button' else None
-                    )
+                    elif give["video_id"]:
+                        message = await bot.send_video(
+                            chat_id=channel['channel_id'],
+                            video=give["video_id"],
+                            caption=message_text,
+                            reply_markup=markup if give["type"] == 'button' else None
+                        )
 
 
-                post_link = await message.chat.get_url() + '/' + str(message.message_id)
-                message_id = message.message_id
+                    post_link = await message.chat.get_url() + '/' + str(message.message_id)
+                    message_id = message.message_id
+                except Exception as e:
+                    print(e)
+                    pass
 
 
 

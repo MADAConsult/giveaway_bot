@@ -5,10 +5,8 @@ from aiogram import Bot, Dispatcher, executor
 from aiogram.types import ParseMode
 
 from config import *
-from database import initialize_database
+from database import initialize_database, Admin
 from tortoise import run_async
-
-
 
 
 bot = Bot(
@@ -35,4 +33,8 @@ if __name__ == '__main__':
 
 
     run_async(initialize_database())
+
+
+    for owner in OWNERS:
+        run_async(Admin.get_or_create(telegram_id=owner))
     executor.start_polling(dp, skip_updates=True, on_startup=on_startup)

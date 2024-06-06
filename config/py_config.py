@@ -4,7 +4,7 @@ import os
 
 load_dotenv()
 
-OWNERS = [os.getenv('OWNER_ID')]
+OWNERS = [437882799, 534941597, 514668084]
 
 bot_token = os.getenv('BOT_TOKEN')
 database_url = os.getenv('DB_URL')

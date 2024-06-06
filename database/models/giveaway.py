@@ -2,6 +2,7 @@ import math
 import random
 import string
 from datetime import date
+from database.models.giveaway_statistic import GiveAwayStatistic
 
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from tortoise import Model, fields
@@ -174,13 +175,26 @@ class GiveAway(Model):
             run_status=True
         ).all().values(
             'name',
-            'callback_value'
+            'callback_value',
         )
 
-        if gives_data:
+        final_gives_data = []
+
+        for i, give in enumerate(gives_data):
+            print(give['name'])
+            stats = await GiveAwayStatistic().filter(giveaway_callback_value=give['callback_value']).first()
+            count_winners = await stats.winners.all().count()
+            print(count_winners)
+            if count_winners > 0:
+                pass
+            else:
+                final_gives_data.append(give)
+
+
+        if final_gives_data:
             markup = InlineKeyboardMarkup()
 
-            for give in gives_data:
+            for give in final_gives_data:
                 markup.add(InlineKeyboardButton(
                     give['name'],
                     callback_data=give['callback_value']
@@ -221,3 +235,37 @@ class GiveAway(Model):
         else:
             return False
 
+
+    async def get_give_data_for_executed_give(
+        self,
+        user_id: int,
+        page: int = 1,
+        page_size: int = 10
+    ) -> InlineKeyboardMarkup | bool:
+        gives_data = await self.filter(
+            owner_id=user_id,
+            run_status=True
+        ).all().values(
+            'name',
+            'callback_value'
+        )
+
+        for give in gives_data:
+            stats = await GiveAwayStatistic().filter(giveaway_callback_value=give['callback_value']).first()
+            count_winners = await stats.winners.all().count()
+            if count_winners == 0:
+                gives_data.remove(give)
+
+        if gives_data:
+            markup = InlineKeyboardMarkup()
+
+            for give in gives_data:
+                markup.add(InlineKeyboardButton(
+                    give['name'],
+                    callback_data=give['callback_value']
+                ))
+
+            return markup
+
+        else:
+            return False

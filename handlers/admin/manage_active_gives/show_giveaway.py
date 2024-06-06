@@ -32,9 +32,10 @@ async def show_active_selected_give(
         message_text = f'<b>Тип розыгрыша:</b> <code>{"По комментариям" if give["type"] == "comments" else "По кнопке"}</code>\n<b>Название розыгрыша:</b> <code>{give["name"]}</code>\n\n<b>Текст:</b>\n{give["text"]}\n\n<b>Фото:</b> <code>{"Нет" if give["photo_id"] == "False" else "Да"}</code>\n<b>Дата окончания:</b> <code>{give["over_date"]}</code>\n<b>Капча:</b> <code>{"Да" if give["captcha"] else "Нет"}</code>\n<b>Количество победителей:</b> <code' \
                        f'>{give["winners_count"]}</code>'
 
-
+    if not message_text:
+        message_text = 'Данные не найдены'
     await jam.message.edit_text(
-        message_text,
+        message_text, 
         reply_markup=kb_admin_active_gives
     )
     await ActiveGivesStates.manage_selected_give.set()
