@@ -20,7 +20,7 @@ async def add_new_group_for_channel(
 
     bot_data = await bot.get_me()
     await jam.message.edit_text(
-        f'1) Добавьте бота @{bot_data.username} в группу канала с правами: \n<code>- публикация сообщений\n- редактирование чужих сообщений</code>\n\n2) Перешлите репостом любое сообщение из группы: ',
+        f'1) Добавьте бота @{bot_data.username} в группу канала с правами: \n<code>- публикация сообщений\n- редактирование чужих сообщений</code>\n\nЛибо просто в виде администратора без каких-либо прав, если хотите, чтобы бот просто отслеживал подписку на канал2) Перешлите репостом любое сообщение из группы: ',
         reply_markup=kb_admin_cancel_action
     )
     await CreatedGivesStates.add_group.set()

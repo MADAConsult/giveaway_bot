@@ -5,8 +5,8 @@ from app import dp
 from keyboards import kb_admin_menu
 from .admin.functions_for_active_gives.handle_new_members_from_button_giveaways import manage_new_members_from_button_gives
 from .admin.functions_for_active_gives.check_channels_subscriptions import check_channels_subscriptions
-from database import TemporaryUsers, GiveAwayStatistic
-from config import start_text
+from database import TemporaryUsers, GiveAwayStatistic, Participant, Admin
+from config import start_text, OWNERS
 
 
 @dp.message_handler(
@@ -37,22 +37,16 @@ async def process_start(jam: types.Message, state: FSMContext):
         elif '=getresults' in give_callback_value:
             give_callback_value = give_callback_value.split('=')[0]
 
-            winners_data = await GiveAwayStatistic().filter(
+            winners_data = await GiveAwayStatistic().get(
                 giveaway_callback_value=give_callback_value
-            ).all().values('winners')
-
+            )
+            winners_data = await winners_data.winners.all()
+            print(winners_data)
 
             text = "💎  <b>Результаты розыгрыша:</b>\n\n"
-            for winners_users in winners_data:
-                winners_users = winners_users['winners']
-
-                for i in range(len(winners_users)):
-                    user_info = winners_users[i]
-                    text += f"{user_info['place']} место - @{user_info['username']}"
-                    if i < len(winners_users) - 1:
-                        text += "\n"
-
-                await jam.answer(text=text)
+            for user_info in winners_data:
+                text += f"@{user_info.username}\n"
+            await jam.answer(text=text)
 
 
 
@@ -73,8 +67,15 @@ async def process_start(jam: types.Message, state: FSMContext):
                     '💎  <b>Вы не подписаны на все каналы!</b>'
                 )
 
-
     else:
+        admins = await Admin.all()
+        for admin in admins:
+            if jam.from_user.id != admin.telegram_id:
+                continue
+            else:
+                break
+        else:
+            return
         await state.finish()
         await jam.answer(
             start_text,

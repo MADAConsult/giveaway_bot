@@ -14,6 +14,10 @@ async def initialize_database():
                     'database.models.telegram_channel',
                     'database.models.giveaway_statistic',
                     'database.models.temporary_users',
+                    'database.models.participant',
+                    'database.models.chatroom',
+                    'database.models.chat',
+                    'database.models.admin',
                 ]
         },
         timezone=str(timezone_info.zone)

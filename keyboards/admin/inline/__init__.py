@@ -11,3 +11,7 @@ from .manage_selected_channel import *
 from .active_gives import *
 from .select_media_file_type import *
 from .owner_menu import *
+from .executed_gives import *
+from .winner_options import *
+from .active_chat_options import *
+from .help_keyboard import *

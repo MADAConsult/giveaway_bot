@@ -5,6 +5,8 @@ from tortoise import Model, fields
 
 from config import timezone_info
 
+from .participant import Participant
+
 
 class GiveAwayStatisticInfo(NamedTuple):
     count_members_in_24_hours: int
@@ -14,11 +16,13 @@ class GiveAwayStatisticInfo(NamedTuple):
 
 class GiveAwayStatistic(Model):
     giveaway_callback_value = fields.TextField(pk=True)
-    members = fields.JSONField(null=True)
+    members = fields.ManyToManyField('models.Participant', related_name='giveaway_statistic')
     post_link = fields.TextField()
-    winners = fields.JSONField(null=True)
+    winners = fields.ManyToManyField('models.Participant', related_name='giveaway_winners', through='giveaway_winners')
 
-
+    def __str__(self):
+        return self.giveaway_callback_value
+    
 
     async def add_statistic(
         self,
@@ -29,12 +33,11 @@ class GiveAwayStatistic(Model):
     ):
         if not await self.exists(giveaway_callback_value=giveaway_callback_value):
 
-            await self.create(
+            obj = await self.create(
                 giveaway_callback_value=giveaway_callback_value,
-                members=members,
-                winners=winners,
                 post_link=post_link
             )
+            await obj.members.add(*members)
 
 
     async def delete_statistic(self, giveaway_callback_value: str):
@@ -43,22 +46,9 @@ class GiveAwayStatistic(Model):
 
 
     async def exists_member(self, giveaway_callback_value: str, member_username: str) -> bool:
-        old_data = await self.filter(
-            giveaway_callback_value=giveaway_callback_value
-        ).all().values('members')
-
-        try:
-            members = old_data[0]['members']
-
-            for member in members:
-                if member_username == member['username']:
-                    return True
-
-            else:
-                return False
-
-        except (KeyError, IndexError):
-            return False
+        stats = await self.get(giveaway_callback_value=giveaway_callback_value)
+        return await stats.members.filter(username=member_username).exists()
+        
 
     async def get_data(self, giveaway_callback_value: str) -> dict:
         data = await self.filter(
@@ -70,24 +60,19 @@ class GiveAwayStatistic(Model):
 
 
     async def get_statistic(self, giveaway_callback_value: str) -> GiveAwayStatisticInfo | bool:
-        data = await self.filter(
-            giveaway_callback_value=giveaway_callback_value
-        ).all().values('members')
-
+        data = await Participant.filter(giveaway_statistic__giveaway_callback_value=giveaway_callback_value).all()
+        count_members_in_24_hours = []
+        count_members_summary = []
 
         if data:
 
-            count_members_in_24_hours = []
-            count_members_summary = []
-
-            members = data[0]['members']
-            for member in members:
-                join_date = datetime.strptime(member["join_date"], "%Y-%m-%d %H:%M:%S.%f%z")
+            for member in data:
+                join_date = member.join_date
 
                 if join_date > datetime.now(timezone_info) - timedelta(days=1):
                     count_members_in_24_hours.append(member)
 
-                count_members_summary.append(member['username'])
+                count_members_summary.append(member.username)
 
             return GiveAwayStatisticInfo(
                 count_members_in_24_hours=len(count_members_in_24_hours),
@@ -98,50 +83,26 @@ class GiveAwayStatistic(Model):
             return False
 
 
-
-
-
     async def update_statistic_members(
         self,
         giveaway_callback_value: str,
         new_member_username: str,
         new_member_id: int,
     ) -> bool:
-
-
-        old_data = await self.filter(
-            giveaway_callback_value=giveaway_callback_value
-        ).all().values('members')
-
-        members = old_data[0]['members']
-
-
-        for member in members:
-            if new_member_id == member['user_id']:
-                return False
-
-
+        current_obj = await self.get(giveaway_callback_value=giveaway_callback_value)
+        if await Participant.exists(telegram_id=new_member_id):
+            member = await Participant.get(telegram_id=new_member_id)
+            await current_obj.members.add(member)
+            return False
         else:
-            members.append({
-                'username': new_member_username,
-                'user_id': new_member_id,
-                'join_date': str(datetime.now(timezone_info))
-            })
-
-            await self.filter(
-                giveaway_callback_value=giveaway_callback_value
-            ).update(members=members)
-
+            new_member = await Participant.create(telegram_id=new_member_id, username=new_member_username)
+            await current_obj.members.add(new_member)
             return True
+
     
     
     async def get_all_members(self, giveaway_callback_value: str) -> list:
-        data = await self.filter(
-            giveaway_callback_value=giveaway_callback_value
-        ).all().values('members')
-
-        return data[0]['members']
-
-
-
-
+        data = await Participant.filter(giveaway_statistic__giveaway_callback_value=giveaway_callback_value).all()
+        return data
+    
+    
