@@ -17,9 +17,8 @@ async def execute_giveaway(
     await ExecutedGivesStates.winner_options.set()
     winner_id = jam.data
     user = await Participant().get(telegram_id=winner_id)
-    markup = [[types.InlineKeyboardButton(text="Связаться с победителем", callback_data=f'l_{user.telegram_id}')], [bt_admin_cancel_action]]
+    markup = [[types.InlineKeyboardButton(text="Сделать чат активным", callback_data=f'a_{user.telegram_id}')], [bt_admin_cancel_action]]
     text = f"Победитель: {user.username}\n"
-    markup.insert(1, [types.InlineKeyboardButton(text="Сделать чат активным", callback_data=f'a_{user.telegram_id}')])
     await jam.message.edit_text(
         text=text,
         reply_markup=types.InlineKeyboardMarkup(inline_keyboard=markup)

@@ -14,3 +14,4 @@ from .owner_menu import *
 from .executed_gives import *
 from .winner_options import *
 from .active_chat_options import *
+from .help_keyboard import *

@@ -1,4 +1,5 @@
 import asyncio
+from aiogram import types
 
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram import Bot, Dispatcher, executor
@@ -37,4 +38,8 @@ if __name__ == '__main__':
 
     for owner in OWNERS:
         run_async(Admin.get_or_create(telegram_id=owner))
+
+    run_async(bot.set_my_commands([
+        types.BotCommand(command="/start", description="Меню"),
+    ]))
     executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
