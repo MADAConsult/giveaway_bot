@@ -12,13 +12,19 @@ class GiveAwayStatisticInfo(NamedTuple):
     count_members_in_24_hours: int
     count_members_summary: int
 
+class GiveawayStatisticMember(Model):
+    giveaway_statistic = fields.ForeignKeyField('models.GiveAwayStatistic', related_name='giveaway_statistic_members')
+    participant = fields.ForeignKeyField('models.Participant', related_name='member_giveaways', to_field='telegram_id', on_delete=fields.CASCADE)
 
+class GiveawayStatisticWinner(Model):
+    giveaway_statistic = fields.ForeignKeyField('models.GiveAwayStatistic', related_name='giveaway_statistic_winners')
+    participant = fields.ForeignKeyField('models.Participant', related_name='winner_giveaways', to_field='telegram_id', on_delete=fields.CASCADE)
 
 class GiveAwayStatistic(Model):
     giveaway_callback_value = fields.TextField(pk=True)
-    members = fields.ManyToManyField('models.Participant', related_name='giveaway_statistic')
+    members = fields.ManyToManyField('models.Participant', related_name='giveaway_statistic', through='models.GiveawayStatisticMember')
     post_link = fields.TextField()
-    winners = fields.ManyToManyField('models.Participant', related_name='giveaway_winners', through='giveaway_winners')
+    winners = fields.ManyToManyField('models.Participant', related_name='giveaway_winners', through='models.GiveawayStatisticWinner')
 
     def __str__(self):
         return self.giveaway_callback_value
