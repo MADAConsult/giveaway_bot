@@ -12,11 +12,11 @@ services:
   db:
     image: postgres:13.3-alpine
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - postgres_database:/var/lib/postgresql/data/
     environment:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
 
 volumes:
-  postgres_data:
+  postgres_database:
