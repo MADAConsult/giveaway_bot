@@ -14,7 +14,15 @@ async def manage_new_members_from_button_gives(
     jam: types.Message,
     give_callback_value: str,
     state: FSMContext
-):
+): 
+    
+    stats = await GiveAwayStatistic().get(giveaway_callback_value=give_callback_value)
+    winner_count = await stats.winners.all().count()
+    if winner_count > 0:
+        await jam.answer(
+            '💎  <b>Результаты розыгрыша уже опубликованы!</b>',
+        )
+        return
 
 
     if not await GiveAwayStatistic().exists_member(
