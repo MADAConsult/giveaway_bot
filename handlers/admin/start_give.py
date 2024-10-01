@@ -55,28 +55,25 @@ async def start_give(jam: types.CallbackQuery, state: FSMContext):
 
 
                     message = ''
-                    if give["photo_id"] is None and give["video_id"] is None:
-                        message = await bot.send_message(
-                            chat_id=channel['channel_id'],
-                            text=message_text,
-                            reply_markup=markup if give["type"] == 'button' else None
-                        )
 
-                    elif give["photo_id"]:
+                    if give["photo_id"]:
                         message = await bot.send_photo(
                             chat_id=channel['channel_id'],
-                            photo=give["photo_id"],
-                            caption=message_text,
-                            reply_markup=markup if give["type"] == 'button' else None
+                            photo=give["photo_id"]
                         )
 
                     elif give["video_id"]:
                         message = await bot.send_video(
                             chat_id=channel['channel_id'],
-                            video=give["video_id"],
-                            caption=message_text,
-                            reply_markup=markup if give["type"] == 'button' else None
+                            video=give["video_id"]
                         )
+                    
+
+                    message = await bot.send_message(
+                        chat_id=channel['channel_id'],
+                        text=message_text,
+                        reply_markup=markup if give["type"] == 'button' else None
+                    )
 
 
                     post_link = await message.chat.get_url() + '/' + str(message.message_id)

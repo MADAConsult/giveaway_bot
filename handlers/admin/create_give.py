@@ -72,6 +72,11 @@ async def get_give_name(jam: types.Message, state: FSMContext):
 @dp.message_handler(state=CreateGiveStates.get_text)
 async def get_give_text(jam: types.Message, state: FSMContext):
     give_text = jam.text
+    if len(give_text) > 4096:
+        return await jam.answer(
+            "Текст слишком длинный",
+            reply_markup=kb_admin_cancel_action
+        )
 
     try:
         await jam.answer(
